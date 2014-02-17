@@ -9,6 +9,13 @@
 /* Begin PBXBuildFile section */
 		54F573F518B1F23500FB5799 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54F573F418B1F23500FB5799 /* main.cpp */; };
 		54F573F718B1F23500FB5799 /* BlockMatching.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 54F573F618B1F23500FB5799 /* BlockMatching.1 */; };
+		54F5740118B1F26400FB5799 /* libopencv_imgproc.2.4.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 54F573FD18B1F26400FB5799 /* libopencv_imgproc.2.4.6.dylib */; };
+		54F5740218B1F26400FB5799 /* libopencv_objdetect.2.4.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 54F573FE18B1F26400FB5799 /* libopencv_objdetect.2.4.6.dylib */; };
+		54F5740318B1F26400FB5799 /* libopencv_core.2.4.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 54F573FF18B1F26400FB5799 /* libopencv_core.2.4.6.dylib */; };
+		54F5740418B1F26400FB5799 /* libopencv_highgui.2.4.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 54F5740018B1F26400FB5799 /* libopencv_highgui.2.4.6.dylib */; };
+		54F5740D18B20F4A00FB5799 /* graph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54F5740818B20F4A00FB5799 /* graph.cpp */; };
+		54F5740E18B20F4A00FB5799 /* instances.inc in Sources */ = {isa = PBXBuildFile; fileRef = 54F5740A18B20F4A00FB5799 /* instances.inc */; };
+		54F5740F18B20F4A00FB5799 /* maxflow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54F5740B18B20F4A00FB5799 /* maxflow.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -28,6 +35,17 @@
 		54F573F118B1F23500FB5799 /* BlockMatching */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BlockMatching; sourceTree = BUILT_PRODUCTS_DIR; };
 		54F573F418B1F23500FB5799 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		54F573F618B1F23500FB5799 /* BlockMatching.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = BlockMatching.1; sourceTree = "<group>"; };
+		54F573FD18B1F26400FB5799 /* libopencv_imgproc.2.4.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_imgproc.2.4.6.dylib; path = ../lib/libopencv_imgproc.2.4.6.dylib; sourceTree = "<group>"; };
+		54F573FE18B1F26400FB5799 /* libopencv_objdetect.2.4.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_objdetect.2.4.6.dylib; path = ../lib/libopencv_objdetect.2.4.6.dylib; sourceTree = "<group>"; };
+		54F573FF18B1F26400FB5799 /* libopencv_core.2.4.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_core.2.4.6.dylib; path = ../lib/libopencv_core.2.4.6.dylib; sourceTree = "<group>"; };
+		54F5740018B1F26400FB5799 /* libopencv_highgui.2.4.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_highgui.2.4.6.dylib; path = ../lib/libopencv_highgui.2.4.6.dylib; sourceTree = "<group>"; };
+		54F5740618B20F4A00FB5799 /* block.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = block.h; sourceTree = "<group>"; };
+		54F5740718B20F4A00FB5799 /* CHANGES.TXT */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CHANGES.TXT; sourceTree = "<group>"; };
+		54F5740818B20F4A00FB5799 /* graph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = graph.cpp; sourceTree = "<group>"; };
+		54F5740918B20F4A00FB5799 /* graph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = graph.h; sourceTree = "<group>"; };
+		54F5740A18B20F4A00FB5799 /* instances.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = instances.inc; sourceTree = "<group>"; };
+		54F5740B18B20F4A00FB5799 /* maxflow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = maxflow.cpp; sourceTree = "<group>"; };
+		54F5740C18B20F4A00FB5799 /* README.TXT */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.TXT; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,6 +53,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				54F5740118B1F26400FB5799 /* libopencv_imgproc.2.4.6.dylib in Frameworks */,
+				54F5740218B1F26400FB5799 /* libopencv_objdetect.2.4.6.dylib in Frameworks */,
+				54F5740318B1F26400FB5799 /* libopencv_core.2.4.6.dylib in Frameworks */,
+				54F5740418B1F26400FB5799 /* libopencv_highgui.2.4.6.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -44,6 +66,10 @@
 		54F573E818B1F23500FB5799 = {
 			isa = PBXGroup;
 			children = (
+				54F573FD18B1F26400FB5799 /* libopencv_imgproc.2.4.6.dylib */,
+				54F573FE18B1F26400FB5799 /* libopencv_objdetect.2.4.6.dylib */,
+				54F573FF18B1F26400FB5799 /* libopencv_core.2.4.6.dylib */,
+				54F5740018B1F26400FB5799 /* libopencv_highgui.2.4.6.dylib */,
 				54F573F318B1F23500FB5799 /* BlockMatching */,
 				54F573F218B1F23500FB5799 /* Products */,
 			);
@@ -60,10 +86,25 @@
 		54F573F318B1F23500FB5799 /* BlockMatching */ = {
 			isa = PBXGroup;
 			children = (
+				54F5740518B20F4A00FB5799 /* maxflow-v3 */,
 				54F573F418B1F23500FB5799 /* main.cpp */,
 				54F573F618B1F23500FB5799 /* BlockMatching.1 */,
 			);
 			path = BlockMatching;
+			sourceTree = "<group>";
+		};
+		54F5740518B20F4A00FB5799 /* maxflow-v3 */ = {
+			isa = PBXGroup;
+			children = (
+				54F5740618B20F4A00FB5799 /* block.h */,
+				54F5740718B20F4A00FB5799 /* CHANGES.TXT */,
+				54F5740818B20F4A00FB5799 /* graph.cpp */,
+				54F5740918B20F4A00FB5799 /* graph.h */,
+				54F5740A18B20F4A00FB5799 /* instances.inc */,
+				54F5740B18B20F4A00FB5799 /* maxflow.cpp */,
+				54F5740C18B20F4A00FB5799 /* README.TXT */,
+			);
+			path = "maxflow-v3";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -118,6 +159,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				54F573F518B1F23500FB5799 /* main.cpp in Sources */,
+				54F5740D18B20F4A00FB5799 /* graph.cpp in Sources */,
+				54F5740E18B20F4A00FB5799 /* instances.inc in Sources */,
+				54F5740F18B20F4A00FB5799 /* maxflow.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -151,6 +195,10 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					/opt/local/include,
+					/opt/local/include/opencv,
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -178,6 +226,10 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					/opt/local/include,
+					/opt/local/include/opencv,
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				SDKROOT = macosx;
 			};
@@ -186,6 +238,10 @@
 		54F573FB18B1F23500FB5799 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../lib\"",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -193,6 +249,10 @@
 		54F573FC18B1F23500FB5799 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../lib\"",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
