@@ -22,6 +22,8 @@ using namespace std;
 #define BLOCK_SIZE 5
 #define COLOR_VARIATION 12
 
+#define INITIAL_BLOCK_MATCH 1
+
 struct ncost
 {
     double *_datas;
@@ -41,13 +43,18 @@ struct ncost
     }
 };
 
+int getLabel(int x, int y)
+{
+    int sh = (SEARCH_SIZE-1)/2;
+    return (y+sh)*SEARCH_SIZE+x+sh;
+}
+
 int getLabel(IplImage *src, int y, int x)
 {
     int xx = (char)src->imageData[y*src->widthStep+x*src->nChannels];
     int yy = (char)src->imageData[y*src->widthStep+x*src->nChannels + 1];
     
-    int sh = (SEARCH_SIZE-1)/2;
-    return (yy+sh)*SEARCH_SIZE+xx+sh;
+    return getLabel(xx, yy);
 }
 
 int getDist(int L1, int L2)
@@ -99,6 +106,8 @@ void block_match(IplImage *prev, IplImage *cur, IplImage *dst, struct ncost& cos
                             count++;
                         }
                     }
+                    int label = getLabel(cx-w, cy-h);
+                    cost.setCost(h, w, label, diff_sum);
                     if (diff_sum/count < min_diff) {
                         min_diff = diff_sum/count;
                         min_x = cx;
@@ -106,7 +115,6 @@ void block_match(IplImage *prev, IplImage *cur, IplImage *dst, struct ncost& cos
                     }
                 }
             }
-            cost.setCost(h, w, 0, min_diff);
             dst->imageData[h*dst->widthStep+w*dst->nChannels + 0] = char(min_x - w);
             dst->imageData[h*dst->widthStep+w*dst->nChannels + 1] = char(min_y - h);
             dst->imageData[h*dst->widthStep+w*dst->nChannels + 2] = 0;
@@ -178,61 +186,68 @@ void alpha_extension(IplImage *src, struct ncost &cost, IplImage *dst)
 
     int E_t;
     int E = INT_MAX;
+    int success;
     
-    for (int alpha = 0;alpha<SEARCH_SIZE*SEARCH_SIZE;alpha++) {
-        typedef Graph<int, int, int> GraphType;
+    for (int loop=0;loop<E;loop++) {
+        success = 0;
         
-        GraphType *g = new GraphType(height*width, height*width*4);
-        
-        for (int i=0;i<height*width;i++) {
-            g->add_node();
-            // データ項の付与
-            int y = i/width;
-            int x = i%width;
+        for (int alpha = 0;alpha<SEARCH_SIZE*SEARCH_SIZE;alpha++) {
+            typedef Graph<int, int, int> GraphType;
             
-            int cur_label = getLabel(src, y, x);
-            g->add_tweights(i, cost.getCost(y, x, cur_label), cost.getCost(y, x, alpha));
-        }
-        for (int i=0;i<width*(height-1);i++) {
-            g->add_node();
-            // 平滑化項の付与(縦)
-            int y = i/width;
-            int x = i%width;
+            GraphType *g = new GraphType(height*width, height*width*4);
             
-            g->add_tweights(i+width*height, getDist(getLabel(src, y, x) ,getLabel(src, y+1, x)), 0);
-            g->add_edge(i, i+width*height, getDist(getLabel(src, y, x), alpha), getDist(getLabel(src, y, x), alpha));
-            g->add_edge(i+width, i+width*height, getDist(getLabel(src, y+1, x), alpha), getDist(getLabel(src, y+1, x), alpha));
-        }
-        for (int i=0;i<width*height;i++) {
-            g->add_node();
-            if (i%(width-1) == 0) continue;
-            // 平滑化項の付与(横)
-            int y = i/width;
-            int x = i%width;
-            
-            g->add_tweights(i+width*height+width*(height-1), getDist(getLabel(src, y, x) ,getLabel(src, y, x+1)), 0);
-            g->add_edge(i, i+width*height+width*(height-1), getDist(getLabel(src, y, x), alpha), getDist(getLabel(src, y, x), alpha));
-            g->add_edge(i+1, i+width*height+width*(height-1), getDist(getLabel(src, y, x+1), alpha), getDist(getLabel(src, y, x+1), alpha));
-        }
-        
-        int flow = g->maxflow();
-        E_t = flow;
-        
-        if (E>E_t) {
-            E = E_t;
-            cout << "Update: Flow = " << E_t << endl;
-            for (int i=0;i<width*height;i++) {
-                if (g->what_segment(i) == GraphType::SOURCE) {
-                    int y = i/width;
-                    int x = i%width;
-                    setLabel(src, y, x, alpha);
-                }
+            for (int i=0;i<height*width;i++) {
+                g->add_node();
+                // データ項の付与
+                int y = i/width;
+                int x = i%width;
+                
+                int cur_label = getLabel(src, y, x);
+                g->add_tweights(i, cost.getCost(y, x, cur_label), cost.getCost(y, x, alpha));
             }
-            cvShowImage("fdfdf", src);
-            cvWaitKey();
+            for (int i=0;i<width*(height-1);i++) {
+                g->add_node();
+                // 平滑化項の付与(縦)
+                int y = i/width;
+                int x = i%width;
+                
+                g->add_tweights(i+width*height, getDist(getLabel(src, y, x) ,getLabel(src, y+1, x)), 0);
+                g->add_edge(i, i+width*height, getDist(getLabel(src, y, x), alpha), getDist(getLabel(src, y, x), alpha));
+                g->add_edge(i+width, i+width*height, getDist(getLabel(src, y+1, x), alpha), getDist(getLabel(src, y+1, x), alpha));
+            }
+            for (int i=0;i<width*height;i++) {
+                g->add_node();
+                if (i%(width-1) == 0) continue;
+                // 平滑化項の付与(横)
+                int y = i/width;
+                int x = i%width;
+                
+                g->add_tweights(i+width*height+width*(height-1), getDist(getLabel(src, y, x) ,getLabel(src, y, x+1)), 0);
+                g->add_edge(i, i+width*height+width*(height-1), getDist(getLabel(src, y, x), alpha), getDist(getLabel(src, y, x), alpha));
+                g->add_edge(i+1, i+width*height+width*(height-1), getDist(getLabel(src, y, x+1), alpha), getDist(getLabel(src, y, x+1), alpha));
+            }
             
+            int flow = g->maxflow();
+            E_t = flow;
+            
+            if (E>E_t) {
+                E = E_t;
+                cout << "Update: Flow = " << E_t << endl;
+                for (int i=0;i<width*height;i++) {
+                    if (g->what_segment(i) == GraphType::SOURCE) {
+                        int y = i/width;
+                        int x = i%width;
+                        setLabel(src, y, x, alpha);
+                    }
+                }
+                cvShowImage("fdfdf", src);
+                cvWaitKey(1);
+                success = 1;
+            }
+            delete g;
         }
-        delete g;
+        
+        if (success == 0) break;
     }
 }
 
@@ -247,7 +262,11 @@ int main(int argc, const char * argv[])
     cvShowImage("image 2", img2);
 
     struct ncost cost = ncost(img1->height, img2->width, SEARCH_SIZE*SEARCH_SIZE);
-    block_match(img1, img2, ret, cost);
+    if (INITIAL_BLOCK_MATCH) {
+        block_match(img1, img2, ret, cost);
+    } else {
+        block_match(img1, img2, result, cost);
+    }
     cvShowImage("ret", ret);
     
     convert2flow(img1, ret, result);
