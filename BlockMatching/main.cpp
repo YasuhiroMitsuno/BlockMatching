@@ -18,13 +18,16 @@ using namespace std;
 #define IMAGE1 "/Users/yasu/Labo/Code/BlockMatching/BlockMatching/images/test3.bmp"
 #define IMAGE2 "/Users/yasu/Labo/Code/BlockMatching/BlockMatching/images/test4.bmp"
 
+#define RESULT "/Users/yasu/Labo/Code/BlockMatching/BlockMatching/images/result.bmp"
+#define FLOW "/Users/yasu/Labo/Code/BlockMatching/BlockMatching/images/flow.bmp"
+
 #define SEARCH_SIZE 5
 #define BLOCK_SIZE 5
 #define COLOR_VARIATION 12
 
 #define INITIAL_BLOCK_MATCH 1
 
-#define LAMBDA 30
+#define LAMBDA 120
 #define BIAS 1
 
 struct ncost
@@ -161,7 +164,7 @@ void block_match(IplImage *prev, IplImage *cur, IplImage *dst, struct ncost& cos
             }
 
 //            cout << "平均: " << diff_sum/avg_count << "最小 :" << diff_min << "最大: " << diff_max << endl;
-            if (diff_sum/avg_count < 5 || h < SEARCH_SIZE || h >= height-SEARCH_SIZE || w < SEARCH_SIZE || w >= width-SEARCH_SIZE) {
+            if (diff_sum/avg_count < 5){// || h < SEARCH_SIZE || h >= height-SEARCH_SIZE || w < SEARCH_SIZE || w >= width-SEARCH_SIZE) {
                 for (int cy=-sh;cy<=sh;cy++) {
                     for (int cx=-sh;cx<=sh;cx++) {
                         cost.setCost(h, w, getLabel(cx, cy), diff_max * 5);
@@ -363,7 +366,7 @@ int main(int argc, const char * argv[])
     IplImage *result = cvCreateImage(cvGetSize(img1), img1->depth, 3);
 
     int a = 0;
-    while (a < 3) {
+    while (a < 1) {
         cvShowImage("img", img1);
         cvWaitKey(1000);
         cvShowImage("img", img2);
@@ -406,9 +409,14 @@ int main(int argc, const char * argv[])
     cvWaitKey();
     
     alpha_extension(img1, ret, cost, result);
+
     convert2flow(img1, ret, result);
     cvShowImage("result", result);
+    cvSaveImage(FLOW, result);
 
+    convertflow(ret, result);
+    cvSaveImage(RESULT, result);
+    
     cvWaitKey();
     return 0;
 }
