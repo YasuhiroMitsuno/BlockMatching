@@ -24,7 +24,7 @@ using namespace std;
 
 #define INITIAL_BLOCK_MATCH 1
 
-#define LAMBDA 120
+#define LAMBDA 30
 #define BIAS 1
 
 struct ncost
@@ -161,7 +161,7 @@ void block_match(IplImage *prev, IplImage *cur, IplImage *dst, struct ncost& cos
             }
 
 //            cout << "平均: " << diff_sum/avg_count << "最小 :" << diff_min << "最大: " << diff_max << endl;
-            if (diff_sum/avg_count < 5) {
+            if (diff_sum/avg_count < 5 || h < SEARCH_SIZE || h >= height-SEARCH_SIZE || w < SEARCH_SIZE || w >= width-SEARCH_SIZE) {
                 for (int cy=-sh;cy<=sh;cy++) {
                     for (int cx=-sh;cx<=sh;cx++) {
                         cost.setCost(h, w, getLabel(cx, cy), diff_max * 5);
