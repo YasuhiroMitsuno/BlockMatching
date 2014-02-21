@@ -17,17 +17,17 @@
 
 using namespace std;
 
-#define IMAGE1 "/Users/sawadanx/Xcode/BlockMatching/BlockMatching/images/test3.bmp"
-#define IMAGE2 "/Users/sawadanx/Xcode/BlockMatching/BlockMatching/images/test4.bmp"
+#define IMAGE1 "/Users/yasu/Labo/Code/BlockMatching/BlockMatching/images/test3.bmp"
+#define IMAGE2 "/Users/yasu/Labo/Code/BlockMatching/BlockMatching/images/test4.bmp"
 
-#define RESULT "/Users/sawadanx/Xcode/BlockMatching/BlockMatching/images/result.bmp"
-#define FLOW "/Users/sawadanx/Xcode/BlockMatching/BlockMatching/images/flow.bmp"
+#define RESULT "/Users/yasu/Labo/Code/BlockMatching/BlockMatching/images/result.bmp"
+#define FLOW "/Users/yasu/Labo/Code/BlockMatching/BlockMatching/images/flow.bmp"
 
 #define COLOR_VARIATION 12
 
 #define INITIAL_BLOCK_MATCH 1
 
-#define LAMBDA 120
+#define LAMBDA 30
 #define BIAS 1
 
 
@@ -36,29 +36,6 @@ int getLabel(int x, int y)
     int sh = SEARCH_SIZE/2;
     return (y+sh)*SEARCH_SIZE+x+sh;
 }
-
-
-struct ncost
-{
-    double *_datas;
-    int _label_size;
-    int _width, _height;
-    ncost(int height, int width, int label_size) {
-        _label_size = label_size;
-        _width = width;
-        _height = height;
-        _datas = (double *)malloc(sizeof(double) * width * height * label_size);
-    }
-    void setCost(int y, int x, int label, double data) {
-        _datas[_label_size*(y*_width+x)+label] = data;
-    }
-    double getCost(int y, int x, int label) {
-        return _datas[_label_size*(y*_width+x)+label];
-    }
-    void release() {
-        free(_datas);
-    }
-};
 
 int getLabel(IplImage *src, int y, int x)
 {
@@ -166,24 +143,60 @@ void block_match(IplImage *prev, IplImage *cur, IplImage *dst, struct ncost& cos
                     }
                     
                     diff_sum += diff;
-                    
+                     
                     cost.setCost(h, w, getLabel(cx-w, cy-h), diff);
                 }
             }
-            
+
             double diff_avg = diff_sum/avg_count;
-            //            cout << "平均: " << diff_sum/avg_count << "最小 :" << diff_min << "最大: " << diff_max << endl;
-            if ((diff_avg - 5 < diff_min && diff_avg+5 > diff_max) || h < SEARCH_SIZE || h >= height-SEARCH_SIZE || w < SEARCH_SIZE || w >= width-SEARCH_SIZE) {
+            
+            double sum = 0;
+            for (int cy=-sh;cy<=sh;cy++) {
+                for (int cx=-sh;cx<=sh;cx++) {
+                    // 画像範囲外は無視
+                    if (cy+h < 0 || cy+h >= height || cx+w < 0 || cx+w >= width) continue;
+                    double c = cost.getCost(h, w, getLabel(cx, cy));
+                    sum += (c - diff_avg) * (c - diff_avg);
+                }
+            }
+            sum /= avg_count;
+            double hh = sqrt(sum);
+
+            double h_min = INT_MAX;
+            double h_max = 0;
+            
+            for (int cy=-sh;cy<=sh;cy++) {
+                for (int cx=-sh;cx<=sh;cx++) {
+                    // 画像範囲外は無視
+                    if (cy+h < 0 || cy+h >= height || cx+w < 0 || cx+w >= width) continue;
+                    double c = cost.getCost(h, w, getLabel(cx, cy));
+                    double hhh = (c - diff_avg)*10/hh + 30;
+                    if( hh == 0) {
+                        hhh = 0;
+                    }
+                    if (h_min > hhh) {
+                        h_min = hhh;
+                        min_x = w + cx;
+                        min_y = h + cy;
+                    }
+                    if (h_max < hhh) {
+                        h_max = hhh;
+                    }
+                    cost.setCost(h, w, getLabel(cx, cy), hhh);
+                }
+            }
+
+            if ( hh < 2 || h < SEARCH_SIZE || h >= height-SEARCH_SIZE || w < SEARCH_SIZE || w >= width-SEARCH_SIZE) {
                 for (int cy=-sh;cy<=sh;cy++) {
                     for (int cx=-sh;cx<=sh;cx++) {
-                        cost.setCost(h, w, getLabel(cx, cy), diff_max * 5);
+                        cost.setCost(h, w, getLabel(cx, cy),  h_max);
                     }
                 }
                 img->imageData[img->widthStep*h+w] = 255;
                 cost.setCost(h, w, getLabel(0, 0), 0);
                 min_x = w; min_y = h;
             } else {
-                cost.setCost(h, w, getLabel(0, 0), diff_max*5);
+                cost.setCost(h, w, getLabel(0, 0), h_max);
             }
 
             dst->imageData[h*dst->widthStep+w*dst->nChannels + 0] = char(min_x - w);
@@ -191,7 +204,7 @@ void block_match(IplImage *prev, IplImage *cur, IplImage *dst, struct ncost& cos
             dst->imageData[h*dst->widthStep+w*dst->nChannels + 2] = 0;
         }
     }
-    cvShowImage("foff", img);
+    cvShowImage("off", img);
     cout << "Finished block Match" << endl;
 }
 
@@ -228,7 +241,7 @@ CvScalar getColor(int x, int y)
     int H = 180*theta/M_PI ;
     
     double s = dist*2/(SEARCH_SIZE);
-    
+    s = s*s;
     if (s > 1) s = 1;
     
     int r,g,b;
@@ -238,8 +251,8 @@ CvScalar getColor(int x, int y)
 
 void convert2flow(IplImage *src, IplImage *label, IplImage *dst)
 {
-#define INTERVAL 8 //フロー間隔
-#define EMP 2 //フロー強調
+#define INTERVAL 5 //フロー間隔
+#define EMP 3 //フロー強調
     int height = src->height;
     int width = src->width;
     
@@ -283,8 +296,8 @@ void alpha_extension(IplImage *src, IplImage *label, struct ncost &cost, IplImag
     int height = src->height;
     int width = src->width;
     
-    int E_t;
-    int E = INT_MAX;
+    double E_t;
+    double E = INT_MAX;
     int success;
     
     IplImage *tmp_img = cvCreateImage(cvGetSize(src), src->depth, src->nChannels);
@@ -296,7 +309,7 @@ void alpha_extension(IplImage *src, IplImage *label, struct ncost &cost, IplImag
         
         for (int alpha = 0;alpha<SEARCH_SIZE*SEARCH_SIZE;alpha++) {
             cout << "alpha: " << alpha << endl;
-            typedef Graph<int, int, int> GraphType;
+            typedef Graph<double, double, double> GraphType;
             
             GraphType *g = new GraphType(height*width, height*width*4);
             

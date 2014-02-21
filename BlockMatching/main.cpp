@@ -17,16 +17,14 @@
 
 using namespace std;
 
-#define IMAGE1 "/Users/kuno_lab/yasuhiro/Code/BlockMatching/BlockMatching/images/test3.bmp"
-#define IMAGE2 "/Users/kuno_lab/yasuhiro/Code/BlockMatching/BlockMatching/images/test4.bmp"
+#define IMAGE1 "/Users/yasu/Labo/Code/BlockMatching/BlockMatching/images/test3.bmp"
+#define IMAGE2 "/Users/yasu/Labo/Code/BlockMatching/BlockMatching/images/test4.bmp"
 
-#define INPUT_FILE "/Users/kuno_lab/yasuhiro/Code/BlockMatching/BlockMatching/mov/mov2.avi"
+#define INPUT_FILE "/Users/yasu/Labo/Code/BlockMatching/BlockMatching/mov/mov2.avi"
 
-#define RESULT "/Users/kuno_lab/yasuhiro/Code/BlockMatching/BlockMatching/images/result.bmp"
-#define FLOW "/Users/kuno_lab/yasuhiro/Code/BlockMatching/BlockMatching/images/flow.bmp"
+#define RESULT "/Users/yasu/Labo/Code/BlockMatching/BlockMatching/images/result.bmp"
+#define FLOW "/Users/yasu/Labo/Code/BlockMatching/BlockMatching/images/flow.bmp"
 
-#define SEARCH_SIZE 5
-#define BLOCK_SIZE 5
 #define COLOR_VARIATION 12
 
 #define INITIAL_BLOCK_MATCH 1
@@ -50,10 +48,11 @@ int main(int argc, const char * argv[])
     
     IplImage *label = cvCreateImage(cvGetSize(prev), prev->depth, prev->nChannels);
     IplImage *flow = cvCreateImage(cvGetSize(prev), prev->depth, prev->nChannels);
+    IplImage *tmp = cvCreateImage(cvGetSize(prev), prev->depth, prev->nChannels);
     
     show_flow_label("flow Label", cvGetSize(prev));
     
-    for (int i=0;i<25;i++) {
+    for (int i=0;i<50;i++) {
         frame = cvQueryFrame(capture);
         cvCopy(frame, prev);
     }
@@ -61,16 +60,31 @@ int main(int argc, const char * argv[])
     while (1) {
         frame = cvQueryFrame(capture);
         if (!frame) break;
+        ncost cost = ncost(prev->width, prev->height, SEARCH_SIZE*SEARCH_SIZE);
         cvCopy(frame, curr);
+        block_match(prev, curr, label, cost);
+
+        convertflow(label, tmp);
+        cvShowImage("block match", tmp);
+        convert2flow(curr, label, tmp);
+        cvShowImage("flow", tmp);
+        
+        alpha_extension(curr, label, cost, label);
+        convertflow(label, tmp);
+        cvShowImage("RESULT", tmp);
+        convert2flow(curr, label, tmp);
+        cvShowImage("RESULT FLOW", tmp);
+        
+        /*
         optical_flow(prev, curr, label, flow);
         cvShowImage("ret", label);
         cvShowImage("result", flow);
         optical_flow(curr, prev, label, flow);
         cvShowImage("r_ret", label);
         cvShowImage("r_result", flow);
+ */
         cvWaitKey(1);
         cvCopy(curr, prev);
-        //cvCopy(curr, prev);
     }
     
 
